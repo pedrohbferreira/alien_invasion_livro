@@ -14,9 +14,6 @@ def run_game():
     )
     pygame.display.set_caption("Alien Invasion")
 
-    # seta uma cor de fundo
-    bg_color = (230, 230, 230)
-
     # Inicia o laço principal do jogo
     # neste onde ocorre todos os eventos
     while True:
@@ -29,7 +26,8 @@ def run_game():
         # seta a cor na tela
         screen.fill(ai_settings.bg_color)
             
-        # Atualiza a tela, deixando a tela mais recente visícel
+        # Atualiza a tela, deixando a tela mais recente visivel
         pygame.display.flip()
+
 
 run_game()
