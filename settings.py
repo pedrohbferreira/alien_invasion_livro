@@ -19,6 +19,13 @@ class Settings(object):
         # velocidade das naves
         self.ship_speed_factor = 1.5
 
+        # configurações do projétil
+        self.bullet_speed_factor = 1
+        self.bullet_width = 3
+        self.bullet_height = 15
+        self.bullet_color = (60, 60, 60)
+        self.bullets_allowed = 3
+
     def set_icon(self, icon_name):
         """
         Seta o icone do jogo, deve ser um arquivo .bmp \n\r
