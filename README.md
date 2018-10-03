@@ -1,5 +1,6 @@
 # alien_invasion_livro
-Projeto criado a partir de estudos com base em um livro de Python
+Projeto criado a partir de estudos com base em um livro de Python.<br>
+<b>Os comentários encontrados no código fonte, tem o intuito de ser muito didático podendo até, "irritar" programadores mais experientes.
 
 <h3>Configurações</h3>
 
