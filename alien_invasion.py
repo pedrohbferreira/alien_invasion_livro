@@ -45,7 +45,7 @@ def run_game():
         gf.update_bullets(ai_settings, screen, ship.rect.height, bullets_group, aliens_group)
 
         # atualiza a posição dos aliens
-        gf.update_aliens(ai_settings, aliens_group)
+        gf.update_aliens(ai_settings, ship, aliens_group)
 
         # atualiza as informações da tela
         gf.update_screen(ai_settings, screen, ship, aliens_group, bullets_group)

@@ -181,14 +181,21 @@ def create_fleet(ai_settings, screen, ship_height, aliens_group):
             create_alien(ai_settings, screen, aliens_group, numero_x, numero_y)
 
 
-def update_aliens(ai_settings, aliens_group):
+def update_aliens(ai_settings, ship, aliens_group):
     """
     Atualiza a posição dos aliens do grupo de aliens
     :param ai_settings: Objeto da classe Settings
+    :param ship: Espaçonave do jogo. Objeto da classe Ship()
     :param aliens_group: Objeto do tipo pygame.sprite.Group()
     """
+    # verifica se chegou na borda
     check_fleet_bordas(ai_settings, aliens_group)
+    # atualiza a posição de cada alien no grupo
     aliens_group.update()
+
+    # verifica se houve colisão entre a nave ou qualquer alien do grupo
+    if pygame.sprite.spritecollideany(ship, aliens_group):
+        print("Deu ruim!!")
 
 
 def check_fleet_bordas(ai_settings, aliens_group):
