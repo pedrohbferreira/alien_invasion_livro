@@ -89,6 +89,18 @@ def update_bullets(ai_settings, screen, ship_height, bullets_group, aliens_group
             bullets_group.remove(bullet)
 
     # verifica se um projétil atingiu o alien
+    check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, aliens_group)
+
+
+def check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, aliens_group):
+    """
+    Resolve a colisão entre projeteis e aliens
+    :param ai_settings: Objeto da classe Settings
+    :param screen: Objecto de pygame.display.set_mode()
+    :param ship_height: Altura da nave
+    :param bullets_group: Grupo de projéteis Objeto de pygame.sprite.Group()
+    :param aliens_group: Grupo de alienígena, Objeto de pygame.sprite.Group()
+    """
     # caso sim, remove o alien e o projétil, por isso o True, True no final do método
     colisoes = pygame.sprite.groupcollide(bullets_group, aliens_group, True, True)
 
