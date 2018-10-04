@@ -8,31 +8,56 @@ from alien import Alien
 
 
 def fire_bullet(ai_settings, screen, ship, bullets_group):
-    """Dispara um projétil se o limiete não for alcançado"""
-    # cria um novo projétil e coloca-o no grupo
+    """
+    Dispara um projétil se o limite não for alcançado \n\r
+    Adiciona ao grupo de projeteis se for menor que o número permitido em Settings()
+    :param ai_settings: Configurações do jogo, objeto do tipo Settings()
+    :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
+    :param ship: Espaçonave do jogo, objeto do tipo Ship()
+    :param bullets_group: Grupo de projéteis disparados, objeto de pygame.sprite.Group()
+    """
+    # verifica se o número de já gerados é menor que o permitido
     if len(bullets_group) < ai_settings.bullets_allowed:
+        # cria um novo projétil e coloca-o no grupo
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets_group.add(new_bullet)
 
 
-def check_keydown_events(event, ai_settings, screen, ship, bullets_group):
-    """ Responde somente a eventos quando aperta alguma tecla """
-    if event == pygame.K_RIGHT:
+def check_keydown_events(event_key, ai_settings, screen, ship, bullets_group):
+    """
+    Responde somente a eventos quando aperta alguma tecla \n\r
+    Seta para movimentos continuos nas direções \n\r
+
+    :param event_key: Chave de evento disparado pelo teclado, tipo pygame.event.get().event.key
+    :param ai_settings: Configurações do jogo, objeto do tipo Settings()
+    :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
+    :param ship: Espaçonave, objeto do tipo Ship()
+    :param bullets_group: Grupo de projéteis disparados, objeto de pygame.sprite.Group()
+    """
+    # saí do jogo ao apertar 'q' ou 'esc'
+    if event_key == pygame.K_q or event_key == pygame.K_ESCAPE:
+        sys.exit()
+    # testa o event_key.key para cada possibilidade
+    # nas setas de direção, seta para movimento continuo
+    if event_key == pygame.K_RIGHT:
         ship.moving_right = True
-    if event == pygame.K_LEFT:
+    if event_key == pygame.K_LEFT:
         ship.moving_left = True
-    if event == pygame.K_UP:
+    if event_key == pygame.K_UP:
         ship.moving_top = True
-    if event == pygame.K_DOWN:
+    if event_key == pygame.K_DOWN:
         ship.moving_bottom = True
-    if event == pygame.K_SPACE:
+    # em caso de barra de espaço, dispara um projétil
+    if event_key == pygame.K_SPACE:
         fire_bullet(ai_settings, screen, ship, bullets_group)
 
 
 def check_keyup_events(event_key, ship):
-    """ Responde somente a eventos quando solta alguma tecla """
-    if event_key == pygame.K_q or event_key == pygame.K_ESCAPE:
-        sys.exit()
+    """
+    Responde somente a eventos quando solta alguma tecla
+    :param event_key: Chave de evento disparado pelo teclado, tipo pygame.event.get().event.key
+    :param ship: Espaçonave, objeto do tipo Ship()
+    """
     if event_key == pygame.K_RIGHT:
         ship.moving_right = False
     if event_key == pygame.K_LEFT:
@@ -46,21 +71,34 @@ def check_keyup_events(event_key, ship):
 def check_events(ai_settings, screen, ship, bullets_group):
     """
     Realiza a escuta de eventos, evento de mouse e/ou teclado \n\r
-    Todo evento de teclado é do tipo(type) KEYDOWN \n\r
+    Todos os eventos de teclado são do tipo(type) KEYDOWN \n\r
     Cada tecla do é uma key que corresponde a K_<alguma coisa> do pygame
+    :param ai_settings: Configurações do jogo, objeto de Settings()
+    :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
+    :param ship: Espaçonave do jogo, objeto de Ship()
+    :param bullets_group: Grupo de balas disparadas, objeto de pygame.sprite.Group()
     """
+    # para cada evento, mouse/teclado
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            sys.exit()
+            sys.exit()   # quando fechar em X da janela
+        # eventos de teclado são em pygame.KEYDOWN
         elif event.type == pygame.KEYDOWN:
             check_keydown_events(event.key, ai_settings, screen, ship, bullets_group)
-
         elif event.type == pygame.KEYUP:
             check_keyup_events(event.key, ship)
 
 
 def update_screen(ai_settings, screen, ship, aliens_group, bullets_group):
-    """Atualiza as imagens na tela, e gera/seta a mais recente"""
+    """
+    Atualiza as imagens na tela, e gera/seta a mais recente \n\r
+    Atualiza também todo os conteúdos que devem ir para a tela \n\r
+    :param ai_settings: Configurações do jogo, objeto de Settings()
+    :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
+    :param ship: Espaçonave do jogo, objeto do tipo Ship()
+    :param aliens_group: Grupo de aliens gerados na tela, objeto de pygame.sprite.Group()
+    :param bullets_group: Grupo de projéteis disparados, objeto de pygame.sprite.Group()
+    """
     # redesenha a tela
     screen.fill(ai_settings.bg_color)
 
@@ -78,7 +116,14 @@ def update_screen(ai_settings, screen, ship, aliens_group, bullets_group):
 
 def update_bullets(ai_settings, screen, ship_height, bullets_group, aliens_group):
     """
-    Atualiza os projéteis na tela e limpa os que passaram os limites da screen
+    Atualiza os projéteis na tela e limpa os que passaram os limites da screen \n\r
+    Chama método para verificar colisão com algum alien
+    :param ai_settings: Configurações do jogo, objeto do tipo Settings()
+    :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
+    :param ship_height: Altura da espaçonave
+    :param bullets_group: Grupo de projéteis gerados, objeto de pygame.sprite.Group()
+    :param aliens_group: Grupo de aliens gerados, objeto de pygame.sprite.Group()
+    :return:
     """
     # chama o método update de cada item o grupo
     bullets_group.update()
@@ -94,7 +139,9 @@ def update_bullets(ai_settings, screen, ship_height, bullets_group, aliens_group
 
 def check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, aliens_group):
     """
-    Resolve a colisão entre projeteis e aliens
+    Resolve a colisão entre projeteis e aliens \n\r
+    Ao colidir, remove o projétil e o alien \n\r
+    Cria uma nova leva de aliens caso não tenha mais ao remover
     :param ai_settings: Objeto da classe Settings
     :param screen: Objecto de pygame.display.set_mode()
     :param ship_height: Altura da nave
@@ -108,6 +155,7 @@ def check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, 
     if len(aliens_group) == 0:
         # apaga os projéteis
         bullets_group.empty()
+        # recria frota de aliens
         create_fleet(ai_settings, screen, ship_height, aliens_group)
 
 
@@ -181,10 +229,11 @@ def create_fleet(ai_settings, screen, ship_height, aliens_group):
             create_alien(ai_settings, screen, aliens_group, numero_x, numero_y)
 
 
-def update_aliens(ai_settings, ship, aliens_group):
+def update_aliens(ai_settings, stats, screen, ship, aliens_group, bullets_group):
     """
     Atualiza a posição dos aliens do grupo de aliens
     :param ai_settings: Objeto da classe Settings
+    :param stats: possui dados estatisticos do jogo, do tipo GameStats()
     :param ship: Espaçonave do jogo. Objeto da classe Ship()
     :param aliens_group: Objeto do tipo pygame.sprite.Group()
     """
