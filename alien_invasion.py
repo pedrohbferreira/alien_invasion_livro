@@ -29,7 +29,7 @@ def run_game():
     ship = Ship(ai_settings, screen)
 
     # cria a frota de aliens
-    gf.create_fleet(ai_settings, screen, aliens_group)
+    gf.create_fleet(ai_settings, screen, ship.rect.height, aliens_group)
 
     # Inicia o laço principal do jogo
     # neste onde ocorre todos os eventos

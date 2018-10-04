@@ -89,25 +89,70 @@ def update_bullets(bullets_group):
             bullets_group.remove(bullet)
 
 
-def create_fleet(ai_settings, screen, aliens_group):
+def get_number_rows(screen_height, ship_height, alien_height) -> int:
+    """
+    Determina o número de linhas de aliens que cabem na tela
+    :param screen_height: Altura total da tela, definido em Settings
+    :param ship_height: Altura de uma espaçonave
+    :param alien_height: Altura de um alien
+    :return: Quantidade de de linhas possíveis
+    """
+    # cálculo: altura da tela, menos a altura de 3 aliens, menos a nave
+    # 3 aliens: para 1 alien no topo e dois na base acima de 1 nave
+    espaco_disponivel_y = (screen_height - (3 * alien_height) - ship_height)
+    # espaço disponível dividido por 2x 1/5 de um alien
+    numero_linhas = int(espaco_disponivel_y / (2 * alien_height))
+    return numero_linhas
+
+
+def get_number_aliens_x(screen_width, alien_width) -> int:
+    """
+    Determina o número de aliens que cabem em uma linha horizontal
+    :param screen_width: Largura total da tela, determinado em Settings
+    :param alien_width: largura de um alien
+    :return: retorna o número de aliens possíveis na horizontal
+    """
+    espaco_disponivel_x = screen_width - (2 * alien_width)
+    numero_aliens_x = int(espaco_disponivel_x / (2 * alien_width))
+    return numero_aliens_x
+
+
+def create_alien(ai_settings, screen, aliens_group, alien_number, numero_linhas):
+    """
+    Cria um alien e o adiciona em aliens_group, grupo de aliens gerenciado na tela
+    :param ai_settings: Objeto de Settings() passao por parametro em Alien()
+    :param screen: Objeto de pygame.display.set_mode() passado por parametro em Alien()
+    :param aliens_group: grupo de aliens
+    :param alien_number: numero de aliens
+    :param numero_linhas: numero de linhas possíveis
+    """
+    # cria um alienígena e coloca n alinha
+    alien = Alien(ai_settings, screen)
+    largura_alien = alien.rect.width
+    # calcula e seta a posição dele na tela
+    alien.x = largura_alien + 2 * largura_alien * alien_number
+    alien.rect.x = alien.x
+    alien.rect.y = alien.rect.height + 2 * alien.rect.height * numero_linhas
+    # adiciona ao grupo de alienígenas
+    aliens_group.add(alien)
+
+
+def create_fleet(ai_settings, screen, ship_height, aliens_group):
     """
     Cria uma frota de alienígena \n\r
     Utiliza o primeiro criado para calcular a quantidade por linha e o esoaçamento \n\r
     :param ai_settings: Objeto da classe Settings
     :param screen: Objeto de retorne de pygame.display.set_mode()
     :param aliens_group: objeto da classe Group() em pygame.sprite
+    :param ship_height: Altura na espaço nave
     """
     # este é apenas para ter as medidas
     alien = Alien(ai_settings, screen)
-    largura_alien = alien.rect.width
-    espaco_disponivel_x = ai_settings.screen_width - (2 * largura_alien)
-    numero_aliens_x = int(espaco_disponivel_x / (2 * largura_alien))
+    numero_aliens_x = get_number_aliens_x(ai_settings.screen_width, alien.rect.width)
+    numero_aliens_y = get_number_rows(ai_settings.screen_height, ship_height, alien.rect.height)
 
-    # cria a primeira linha de alienígenas
-    for numero_alien in range(numero_aliens_x):
-        # cria um alienígena e coloca n alinha
-        alien = Alien(ai_settings, screen)
-        alien.x = largura_alien + 2 * largura_alien * numero_alien
-        alien.rect.x = alien.x
-        # adiciona ao grupo de alienígenas
-        aliens_group.add(alien)
+    # para cada linha de alien
+    for numero_y in range(numero_aliens_y):
+        # cria um alien para cada espoço de alien disponível
+        for numero_x in range(numero_aliens_x):
+            create_alien(ai_settings, screen, aliens_group, numero_x, numero_y)
