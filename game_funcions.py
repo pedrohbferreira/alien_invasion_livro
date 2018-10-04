@@ -153,6 +153,42 @@ def create_fleet(ai_settings, screen, ship_height, aliens_group):
 
     # para cada linha de alien
     for numero_y in range(numero_aliens_y):
-        # cria um alien para cada espoço de alien disponível
+        # cria um alien para cada espaço de alien disponível
         for numero_x in range(numero_aliens_x):
             create_alien(ai_settings, screen, aliens_group, numero_x, numero_y)
+
+
+def update_aliens(ai_settings, aliens_group):
+    """
+    Atualiza a posição dos aliens do grupo de aliens
+    :param ai_settings: Objeto da classe Settings
+    :param aliens_group: Objeto do tipo pygame.sprite.Group()
+    """
+    check_fleet_bordas(ai_settings, aliens_group)
+    aliens_group.update()
+
+
+def check_fleet_bordas(ai_settings, aliens_group):
+    """
+    Verifica se algum alien do group encostou na borda
+    :param ai_settings: Objeto da classe Settings()
+    :param aliens_group: Objeto da class pygame.sprite.Group()
+    """
+    for alien in aliens_group.sprites():
+        if alien.check_bordas():
+            mudar_direcao_fleet(ai_settings, aliens_group)
+            break
+
+
+def mudar_direcao_fleet(ai_settings, aliens_group):
+    """
+    Faz toda a tropa descer e muda a direção
+    :param ai_settings: Objeto da classe Settings()
+    :param aliens_group: Objeto da classe pygame.sprite.Group()
+    """
+    # para cada alien desce a altura de settings
+    for alien in aliens_group.sprites():
+        alien.rect.y += ai_settings.fleet_alien_drop_speed
+
+    # muda a direção de config
+    ai_settings.fleet_alien_direction *= -1

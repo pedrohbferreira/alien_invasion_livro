@@ -28,6 +28,11 @@ class Settings(object):
         self.bullet_color = (60, 60, 60)
         self.bullets_allowed = 3
 
+        # configurações dos aliens
+        self.alien_speed_factor = 1
+        self.fleet_alien_drop_speed = 10
+        self.fleet_alien_direction = 1  # 1 representa direita e -1 esquerda
+
     def set_icon(self, icon_name):
         """
         Seta o icone do jogo, deve ser um arquivo .bmp \n\r
