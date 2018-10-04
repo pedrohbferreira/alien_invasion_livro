@@ -76,7 +76,7 @@ def update_screen(ai_settings, screen, ship, aliens_group, bullets_group):
     pygame.display.flip()
 
 
-def update_bullets(bullets_group):
+def update_bullets(ai_settings, screen, ship_height, bullets_group, aliens_group):
     """
     Atualiza os projéteis na tela e limpa os que passaram os limites da screen
     """
@@ -87,6 +87,16 @@ def update_bullets(bullets_group):
     for bullet in bullets_group.copy():
         if bullet.rect.bottom <= 0:
             bullets_group.remove(bullet)
+
+    # verifica se um projétil atingiu o alien
+    # caso sim, remove o alien e o projétil, por isso o True, True no final do método
+    colisoes = pygame.sprite.groupcollide(bullets_group, aliens_group, True, True)
+
+    # verifica se ainda existem aliens, caso não, limpa as balas e recria a frota
+    if len(aliens_group) == 0:
+        # apaga os projéteis
+        bullets_group.empty()
+        create_fleet(ai_settings, screen, ship_height, aliens_group)
 
 
 def get_number_rows(screen_height, ship_height, alien_height) -> int:
@@ -100,6 +110,7 @@ def get_number_rows(screen_height, ship_height, alien_height) -> int:
     # cálculo: altura da tela, menos a altura de 3 aliens, menos a nave
     # 3 aliens: para 1 alien no topo e dois na base acima de 1 nave
     espaco_disponivel_y = (screen_height - (3 * alien_height) - ship_height)
+
     # espaço disponível dividido por 2x 1/5 de um alien
     numero_linhas = int(espaco_disponivel_y / (2 * alien_height))
     return numero_linhas
@@ -140,7 +151,7 @@ def create_alien(ai_settings, screen, aliens_group, alien_number, numero_linhas)
 def create_fleet(ai_settings, screen, ship_height, aliens_group):
     """
     Cria uma frota de alienígena \n\r
-    Utiliza o primeiro criado para calcular a quantidade por linha e o esoaçamento \n\r
+    Utiliza o primeiro criado para calcular a quantidade por linha e o espaçamento \n\r
     :param ai_settings: Objeto da classe Settings
     :param screen: Objeto de retorne de pygame.display.set_mode()
     :param aliens_group: objeto da classe Group() em pygame.sprite

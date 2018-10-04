@@ -42,7 +42,7 @@ def run_game():
         ship.update()
 
         # atualiza e limpa os projéteis
-        gf.update_bullets(bullets_group)
+        gf.update_bullets(ai_settings, screen, ship.rect.height, bullets_group, aliens_group)
 
         # atualiza a posição dos aliens
         gf.update_aliens(ai_settings, aliens_group)
