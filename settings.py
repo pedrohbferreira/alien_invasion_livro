@@ -20,6 +20,7 @@ class Settings(object):
 
         # velocidade das naves
         self.ship_speed_factor = 1.5
+        self.ship_limit = 3
 
         # configurações do projétil
         self.bullet_speed_factor = 1.2
@@ -29,7 +30,7 @@ class Settings(object):
         self.bullets_allowed = 3
 
         # configurações dos aliens
-        self.alien_speed_factor = 0.7
+        self.alien_speed_factor = 1
         self.fleet_alien_drop_speed = 5
         self.fleet_alien_direction = 1  # 1 representa direita e -1 esquerda
 

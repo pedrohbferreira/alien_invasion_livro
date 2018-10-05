@@ -7,6 +7,7 @@ from pygame.sprite import Group
 import game_funcions as gf
 from settings import Settings
 from ship import Ship
+from game_stats import GameStats
 
 
 def run_game():
@@ -31,6 +32,9 @@ def run_game():
     # cria a frota de aliens
     gf.create_fleet(ai_settings, screen, ship.rect.height, aliens_group)
 
+    # cria a instancia para estatísticas
+    stats = GameStats(ai_settings)
+
     # Inicia o laço principal do jogo
     # neste onde ocorre todos os eventos
     while True:
@@ -45,7 +49,7 @@ def run_game():
         gf.update_bullets(ai_settings, screen, ship.rect.height, bullets_group, aliens_group)
 
         # atualiza a posição dos aliens
-        gf.update_aliens(ai_settings, ship, aliens_group)
+        gf.update_aliens(ai_settings, stats, screen, ship, aliens_group, bullets_group)
 
         # atualiza as informações da tela
         gf.update_screen(ai_settings, screen, ship, aliens_group, bullets_group)
