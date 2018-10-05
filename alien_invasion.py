@@ -42,14 +42,15 @@ def run_game():
         # escuta de eventos de mouse ou teclado
         gf.check_events(ai_settings, screen, ship, bullets_group)
 
-        # atualiza a posição da nave
-        ship.update()
+        if stats.game_active:
+            # atualiza a posição da nave
+            ship.update()
 
-        # atualiza e limpa os projéteis
-        gf.update_bullets(ai_settings, screen, ship.rect.height, bullets_group, aliens_group)
+            # atualiza e limpa os projéteis
+            gf.update_bullets(ai_settings, screen, ship.rect.height, bullets_group, aliens_group)
 
-        # atualiza a posição dos aliens
-        gf.update_aliens(ai_settings, stats, screen, ship, aliens_group, bullets_group)
+            # atualiza a posição dos aliens
+            gf.update_aliens(ai_settings, stats, screen, ship, aliens_group, bullets_group)
 
         # atualiza as informações da tela
         gf.update_screen(ai_settings, screen, ship, aliens_group, bullets_group)

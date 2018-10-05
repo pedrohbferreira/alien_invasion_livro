@@ -59,3 +59,13 @@ class Ship(object):
     def blitme(self):
         """Desenha a espaçonave na tela"""
         self.screen.blit(self.image, self.rect)
+
+    def center_ship(self):
+        """Centraliza o objeto na tela"""
+        # inicia cada nova nave na parte central inferior da tela
+        self.rect.centerx = self.screen_rect.centerx
+        self.rect.bottom = self.screen_rect.bottom
+
+        # valor decimal para o centro horizontal da nave
+        self.__center_x = float(self.rect.centerx)
+        self.__center_y = float(self.rect.centery)

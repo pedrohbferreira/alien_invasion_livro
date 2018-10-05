@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from time import sleep
 import pygame
 
 from bullet import Bullet
@@ -27,7 +28,6 @@ def check_keydown_events(event_key, ai_settings, screen, ship, bullets_group):
     """
     Responde somente a eventos quando aperta alguma tecla \n\r
     Seta para movimentos continuos nas direções \n\r
-
     :param event_key: Chave de evento disparado pelo teclado, tipo pygame.event.get().event.key
     :param ai_settings: Configurações do jogo, objeto do tipo Settings()
     :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
@@ -54,7 +54,7 @@ def check_keydown_events(event_key, ai_settings, screen, ship, bullets_group):
 
 def check_keyup_events(event_key, ship):
     """
-    Responde somente a eventos quando solta alguma tecla
+    Responde somente a eventos quando solta alguma tecla \n\r
     :param event_key: Chave de evento disparado pelo teclado, tipo pygame.event.get().event.key
     :param ship: Espaçonave, objeto do tipo Ship()
     """
@@ -72,7 +72,7 @@ def check_events(ai_settings, screen, ship, bullets_group):
     """
     Realiza a escuta de eventos, evento de mouse e/ou teclado \n\r
     Todos os eventos de teclado são do tipo(type) KEYDOWN \n\r
-    Cada tecla do é uma key que corresponde a K_<alguma coisa> do pygame
+    Cada tecla do é uma key que corresponde a K_<alguma coisa> do pygame \n\r
     :param ai_settings: Configurações do jogo, objeto de Settings()
     :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
     :param ship: Espaçonave do jogo, objeto de Ship()
@@ -117,7 +117,7 @@ def update_screen(ai_settings, screen, ship, aliens_group, bullets_group):
 def update_bullets(ai_settings, screen, ship_height, bullets_group, aliens_group):
     """
     Atualiza os projéteis na tela e limpa os que passaram os limites da screen \n\r
-    Chama método para verificar colisão com algum alien
+    Chama método para verificar colisão com algum alien \n\r
     :param ai_settings: Configurações do jogo, objeto do tipo Settings()
     :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
     :param ship_height: Altura da espaçonave
@@ -141,7 +141,7 @@ def check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, 
     """
     Resolve a colisão entre projeteis e aliens \n\r
     Ao colidir, remove o projétil e o alien \n\r
-    Cria uma nova leva de aliens caso não tenha mais ao remover
+    Cria uma nova leva de aliens caso não tenha mais ao remover \n\r
     :param ai_settings: Objeto da classe Settings
     :param screen: Objecto de pygame.display.set_mode()
     :param ship_height: Altura da nave
@@ -161,7 +161,7 @@ def check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, 
 
 def get_number_rows(screen_height, ship_height, alien_height) -> int:
     """
-    Determina o número de linhas de aliens que cabem na tela
+    Determina o número de linhas de aliens que cabem na tela \n\r
     :param screen_height: Altura total da tela, definido em Settings
     :param ship_height: Altura de uma espaçonave
     :param alien_height: Altura de um alien
@@ -178,7 +178,7 @@ def get_number_rows(screen_height, ship_height, alien_height) -> int:
 
 def get_number_aliens_x(screen_width, alien_width) -> int:
     """
-    Determina o número de aliens que cabem em uma linha horizontal
+    Determina o número de aliens que cabem em uma linha horizontal \n\r
     :param screen_width: Largura total da tela, determinado em Settings
     :param alien_width: largura de um alien
     :return: retorna o número de aliens possíveis na horizontal
@@ -190,7 +190,7 @@ def get_number_aliens_x(screen_width, alien_width) -> int:
 
 def create_alien(ai_settings, screen, aliens_group, alien_number, numero_linhas):
     """
-    Cria um alien e o adiciona em aliens_group, grupo de aliens gerenciado na tela
+    Cria um alien e o adiciona em aliens_group, grupo de aliens gerenciado na tela \n\r
     :param ai_settings: Objeto de Settings() passao por parametro em Alien()
     :param screen: Objeto de pygame.display.set_mode() passado por parametro em Alien()
     :param aliens_group: grupo de aliens
@@ -229,27 +229,9 @@ def create_fleet(ai_settings, screen, ship_height, aliens_group):
             create_alien(ai_settings, screen, aliens_group, numero_x, numero_y)
 
 
-def update_aliens(ai_settings, stats, screen, ship, aliens_group, bullets_group):
-    """
-    Atualiza a posição dos aliens do grupo de aliens
-    :param ai_settings: Objeto da classe Settings
-    :param stats: possui dados estatisticos do jogo, do tipo GameStats()
-    :param ship: Espaçonave do jogo. Objeto da classe Ship()
-    :param aliens_group: Objeto do tipo pygame.sprite.Group()
-    """
-    # verifica se chegou na borda
-    check_fleet_bordas(ai_settings, aliens_group)
-    # atualiza a posição de cada alien no grupo
-    aliens_group.update()
-
-    # verifica se houve colisão entre a nave ou qualquer alien do grupo
-    if pygame.sprite.spritecollideany(ship, aliens_group):
-        print("Deu ruim!!")
-
-
 def check_fleet_bordas(ai_settings, aliens_group):
     """
-    Verifica se algum alien do group encostou na borda
+    Verifica se algum alien do group encostou na borda \n\r
     :param ai_settings: Objeto da classe Settings()
     :param aliens_group: Objeto da class pygame.sprite.Group()
     """
@@ -261,7 +243,7 @@ def check_fleet_bordas(ai_settings, aliens_group):
 
 def mudar_direcao_fleet(ai_settings, aliens_group):
     """
-    Faz toda a tropa descer e muda a direção
+    Faz toda a tropa descer e muda a direção \n\r
     :param ai_settings: Objeto da classe Settings()
     :param aliens_group: Objeto da classe pygame.sprite.Group()
     """
@@ -271,3 +253,80 @@ def mudar_direcao_fleet(ai_settings, aliens_group):
 
     # muda a direção de config
     ai_settings.fleet_alien_direction *= -1
+
+
+def update_aliens(ai_settings, game_stats, screen, ship, aliens_group, bullets_group):
+    """
+    Atualiza a posição dos aliens do grupo de aliens \n\r
+    Chamada de método para verifica se algum alien encostou nas bordas \n\r
+    Chamada de método para colisão de nave com alien \n\r
+
+    :param ai_settings: Objeto da classe Settings
+    :param game_stats: possui dados estatisticos do jogo, do tipo GameStats()
+    :param screen: Objeto de retorne de pygame.display.set_mode()
+    :param ship: Espaçonave do jogo. Objeto da classe Ship()
+    :param aliens_group: Objeto do tipo pygame.sprite.Group()
+    :param bullets_group: Grupo de projéteis Objeto de pygame.sprite.Group()
+    """
+    # verifica se chegou na borda
+    check_fleet_bordas(ai_settings, aliens_group)
+    # atualiza a posição de cada alien no grupo
+    aliens_group.update()
+
+    # verifica se houve colisão entre a nave ou qualquer alien do grupo
+    if pygame.sprite.spritecollideany(ship, aliens_group):
+        ship_hit(ai_settings, game_stats, screen, ship, aliens_group, bullets_group)
+
+    # Verifica se alguma alien atingiu o bottom da tela
+    check_alien_bottom(ai_settings, game_stats, screen, ship, aliens_group, bullets_group)
+
+
+def ship_hit(ai_settings, game_stats, screen, ship, aliens_group, bullets_group):
+    """
+    Responde quando uma espaçonave é atingida/encosta em um alien \n\r
+    Reduzindo a quantidade de tentativas, reiniciando a frota de aliens e limpando os projéteis \n\r
+    Coloca um tempo de espera antes de reiniciar o jogo \n\r
+    :param ai_settings: Configurações do jogo, objeto de Settings()
+    :param game_stats: Estatísticas do jogo, objeto da classe GameStats()
+    :param screen: Objeto de retorne de pygame.display.set_mode()
+    :param ship: Espaçonave do jogo. Objeto da classe Ship()
+    :param aliens_group: Objeto do tipo pygame.sprite.Group()
+    :param bullets_group: Grupo de projéteis Objeto de pygame.sprite.Group()
+    """
+    if game_stats.ships_left > 0:
+        # decrementa a quantidade de tentativas
+        game_stats.ships_left -= 1
+
+        # limpa os aliens e projéteis
+        aliens_group.empty()
+        bullets_group.empty()
+
+        # cria uma frota e centraliza a espaçonave
+        create_fleet(ai_settings, screen, ship.rect.height, aliens_group)
+        ship.center_ship()
+
+        # faz uma pausa
+        sleep(0.5)
+    else:
+        game_stats.game_active = False
+
+
+def check_alien_bottom(ai_settings, game_stats, screen, ship, aliens_group, bullets_group):
+    """
+    Verifica se algum alien encostou na parte inferior da tela \n\r
+    Ao encostar, chama mesmo método de colisão de alien com a espaçonave \n\r
+    :param ai_settings: Configurações do jogo, objeto de Settings()
+    :param game_stats: Estatísticas do jogo, objeto da classe GameStats()
+    :param screen: Objeto de retorne de pygame.display.set_mode()
+    :param ship: Espaçonave do jogo. Objeto da classe Ship()
+    :param aliens_group: Objeto do tipo pygame.sprite.Group()
+    :param bullets_group: Grupo de projéteis Objeto de pygame.sprite.Group()
+    """
+    # pega o retangulo da tela
+    screen_rect = screen.get_rect()
+
+    # verifica em cada alien o bottom com o bottom da tela
+    for alien in aliens_group.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+            # mesmo quando nave atinge alien
+            ship_hit(ai_settings, game_stats, screen, ship, aliens_group, bullets_group)

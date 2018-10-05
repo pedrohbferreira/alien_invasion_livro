@@ -1,7 +1,10 @@
 # alien_invasion_livro
 Projeto criado a partir de estudos com base em um livro de Python.<br>
-<b>Os comentários encontrados no código fonte, tem o intuito de ser muito didático podendo até, "irritar" programadores mais experientes.
-
+<b>Os comentários encontrados no código fonte, tem o intuito de ser muito didático podendo até, "irritar" programadores mais experientes.</b>
+<br>
+<p>
+Execute: <code>python alien_invasion.py</code> 
+</p>
 <h3>Configurações</h3>
 
 <h5>Linux:</h5>
