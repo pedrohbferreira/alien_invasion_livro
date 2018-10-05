@@ -78,6 +78,7 @@ def check_button_play(game_stats, btn_play, mouse_x, mouse_y):
     """
     if btn_play.rect.collidepoint(mouse_x, mouse_y):
         game_stats.game_active = True
+        game_stats.reset_stats()
 
 
 def check_events(ai_settings, screen, game_stats, btn_play, ship, bullets_group):
