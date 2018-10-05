@@ -68,13 +68,27 @@ def check_keyup_events(event_key, ship):
         ship.moving_bottom = False
 
 
-def check_events(ai_settings, screen, ship, bullets_group):
+def check_button_play(game_stats, btn_play, mouse_x, mouse_y):
+    """
+    Marca o game_active como True \n\r
+    :param game_stats: Objeto com estatisticas do jogo, objeto de GameStats()
+    :param btn_play: Botão play do jogo, objeto de Button()
+    :param mouse_x: Posição x do clique do mouse
+    :param mouse_y: Posição y do clique do mouse
+    """
+    if btn_play.rect.collidepoint(mouse_x, mouse_y):
+        game_stats.game_active = True
+
+
+def check_events(ai_settings, screen, game_stats, btn_play, ship, bullets_group):
     """
     Realiza a escuta de eventos, evento de mouse e/ou teclado \n\r
     Todos os eventos de teclado são do tipo(type) KEYDOWN \n\r
     Cada tecla do é uma key que corresponde a K_<alguma coisa> do pygame \n\r
     :param ai_settings: Configurações do jogo, objeto de Settings()
     :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
+    :param game_stats: possui dados estatisticos do jogo, do tipo GameStats()
+    :param btn_play: Objeto da classe Button()
     :param ship: Espaçonave do jogo, objeto de Ship()
     :param bullets_group: Grupo de balas disparadas, objeto de pygame.sprite.Group()
     """
@@ -87,17 +101,23 @@ def check_events(ai_settings, screen, ship, bullets_group):
             check_keydown_events(event.key, ai_settings, screen, ship, bullets_group)
         elif event.type == pygame.KEYUP:
             check_keyup_events(event.key, ship)
+        # eventos do mouse
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()   # pega a posição onde foi clicado
+            check_button_play(game_stats, btn_play, mouse_x, mouse_y)
 
 
-def update_screen(ai_settings, screen, ship, aliens_group, bullets_group):
+def update_screen(ai_settings, screen, game_stats, ship, aliens_group, bullets_group, button):
     """
     Atualiza as imagens na tela, e gera/seta a mais recente \n\r
     Atualiza também todo os conteúdos que devem ir para a tela \n\r
     :param ai_settings: Configurações do jogo, objeto de Settings()
     :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
     :param ship: Espaçonave do jogo, objeto do tipo Ship()
+    :param game_stats: possui dados estatisticos do jogo, do tipo GameStats()
     :param aliens_group: Grupo de aliens gerados na tela, objeto de pygame.sprite.Group()
     :param bullets_group: Grupo de projéteis disparados, objeto de pygame.sprite.Group()
+    :param button: Objeto da classe Button()
     """
     # redesenha a tela
     screen.fill(ai_settings.bg_color)
@@ -109,6 +129,10 @@ def update_screen(ai_settings, screen, ship, aliens_group, bullets_group):
     # desenha a nave e o alien
     ship.blitme()
     aliens_group.draw(screen)
+
+    # desenha o botão se o jogo não estiver ativo
+    if not game_stats.game_active:
+        button.draw_button()
 
     # a presenta a tela mais recente
     pygame.display.flip()
