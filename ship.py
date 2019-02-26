@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import pygame
+from pygame import Surface
+from settings import Settings
+from pygame.sprite import Sprite
 
 
-class Ship(object):
+class Ship(Sprite):
     """
     Classe responsável por todas as funcionalidades da nave
     """
-    def __init__(self, settings, screen):
+    def __init__(self, settings: Settings, screen: Surface):
         """Inicializa a espaçonave e defina a posição inicial"""
+        super(Ship, self).__init__()
+
         self.screen = screen
         self.setting = settings
 

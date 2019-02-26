@@ -34,6 +34,15 @@ class Settings(object):
         self.fleet_alien_drop_speed = 5
         self.fleet_alien_direction = 1  # 1 representa direita e -1 esquerda
 
+        # taxa que velocidade aumenta
+        self.speedup_scale = 1.1
+
+        # pontuação do alien
+        self.alien_points = 10
+        # taxa que a pontuação aumenta
+        self.score_scale = 1.5
+        self.initialize_dynamic_settings()
+
     def set_icon(self, icon_name):
         """
         Seta o icone do jogo, deve ser um arquivo .bmp \n\r
@@ -55,3 +64,23 @@ class Settings(object):
 
         # define o icon na tela do jogo
         pygame.display.set_icon(icon)
+
+    def initialize_dynamic_settings(self):
+        """Inicializa as configurações que mudam durante o jogo"""
+        self.ship_speed_factor = 1.5
+        self.bullet_speed_factor = 1.2
+        self.alien_speed_factor = 1
+
+        # fleet_alien_direction representa a direção, 1 p/ direito -1 p/ esquerda
+        self.fleet_alien_direction = 1
+
+        # reinicia a pontuação
+        self.alien_points = 10
+
+    def increase_speed(self):
+        """Aumenta as velocidades"""
+        self.ship_speed_factor *= self.speedup_scale
+        self.bullet_speed_factor *= self.speedup_scale
+        self.alien_speed_factor *= self.speedup_scale
+        # aumenta a soma da pontuação
+        self.alien_points = int(self.alien_points * self.score_scale)

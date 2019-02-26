@@ -3,12 +3,18 @@
 import sys
 from time import sleep
 import pygame
+from pygame import Surface
+from pygame.sprite import Group
 
 from bullet import Bullet
 from alien import Alien
+from settings import Settings
+from ship import Ship
+from game_stats import GameStats
+from scoreboard import Scoreboard
 
 
-def fire_bullet(ai_settings, screen, ship, bullets_group):
+def fire_bullet(ai_settings: Settings, screen: Surface, ship: Ship, bullets_group: Group):
     """
     Dispara um projétil se o limite não for alcançado \n\r
     Adiciona ao grupo de projeteis se for menor que o número permitido em Settings()
@@ -24,7 +30,7 @@ def fire_bullet(ai_settings, screen, ship, bullets_group):
         bullets_group.add(new_bullet)
 
 
-def check_keydown_events(event_key, ai_settings, screen, ship, bullets_group):
+def check_keydown_events(event_key, ai_settings: Settings, screen: Surface, ship: Ship, bullets_group: Group):
     """
     Responde somente a eventos quando aperta alguma tecla \n\r
     Seta para movimentos continuos nas direções \n\r
@@ -41,18 +47,18 @@ def check_keydown_events(event_key, ai_settings, screen, ship, bullets_group):
     # nas setas de direção, seta para movimento continuo
     if event_key == pygame.K_RIGHT:
         ship.moving_right = True
-    if event_key == pygame.K_LEFT:
+    elif event_key == pygame.K_LEFT:
         ship.moving_left = True
     if event_key == pygame.K_UP:
         ship.moving_top = True
-    if event_key == pygame.K_DOWN:
+    elif event_key == pygame.K_DOWN:
         ship.moving_bottom = True
     # em caso de barra de espaço, dispara um projétil
     if event_key == pygame.K_SPACE:
         fire_bullet(ai_settings, screen, ship, bullets_group)
 
 
-def check_keyup_events(event_key, ship):
+def check_keyup_events(event_key, ship: Ship):
     """
     Responde somente a eventos quando solta alguma tecla \n\r
     :param event_key: Chave de evento disparado pelo teclado, tipo pygame.event.get().event.key
@@ -68,24 +74,54 @@ def check_keyup_events(event_key, ship):
         ship.moving_bottom = False
 
 
-def check_button_play(game_stats, btn_play, mouse_x, mouse_y):
+def check_button_play(ai_settings: Settings, screen: Surface, game_stats: GameStats, score_board: Scoreboard, btn_play,
+                      ship: Ship, aliens_group: Group, bullets_group: Group, mouse_x, mouse_y):
     """
     Marca o game_active como True \n\r
+    :param screen:
+    :param ai_settings: Objeto Settings, contém as configurações do jogo
+    :param ship: Objeto Ship, nave do jogo
+    :param aliens_group: Uma lista de dados de objeto Alien
+    :param bullets_group: Uma lista de dados de objeto Bullet
     :param game_stats: Objeto com estatisticas do jogo, objeto de GameStats()
     :param btn_play: Botão play do jogo, objeto de Button()
     :param mouse_x: Posição x do clique do mouse
     :param mouse_y: Posição y do clique do mouse
     """
-    if btn_play.rect.collidepoint(mouse_x, mouse_y):
+    button_clicked = btn_play.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not game_stats.game_active:
+        # reinicia as configurações do jogo
+        ai_settings.initialize_dynamic_settings()
+
+        # Oculta o ponteiro do mouse
+        pygame.mouse.set_visible(False)
+
+        # Reinicia os dados
         game_stats.game_active = True
         game_stats.reset_stats()
 
+        # limpa e mostra as informações novamente
+        score_board.prep_score()
+        score_board.prep_high_score()
+        score_board.prep_level()
+        score_board.prep_ships()
 
-def check_events(ai_settings, screen, game_stats, btn_play, ship, bullets_group):
+        # Esvazia a lista de aliens e projéteis
+        aliens_group.empty()
+        bullets_group.empty()
+
+        # Cria uma nova frota e centraliza a nave
+        create_fleet(ai_settings, screen, ship.rect.height, aliens_group)
+        ship.center_ship()
+
+
+def check_events(ai_settings: Settings, screen: Surface, game_stats: GameStats, score_board: Scoreboard, btn_play,
+                 ship: Ship, aliens_group: Group, bullets_group: Group):
     """
     Realiza a escuta de eventos, evento de mouse e/ou teclado \n\r
     Todos os eventos de teclado são do tipo(type) KEYDOWN \n\r
     Cada tecla do é uma key que corresponde a K_<alguma coisa> do pygame \n\r
+    :param aliens_group: Uma lista de dados de objeto Alien
     :param ai_settings: Configurações do jogo, objeto de Settings()
     :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
     :param game_stats: possui dados estatisticos do jogo, do tipo GameStats()
@@ -105,10 +141,11 @@ def check_events(ai_settings, screen, game_stats, btn_play, ship, bullets_group)
         # eventos do mouse
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()   # pega a posição onde foi clicado
-            check_button_play(game_stats, btn_play, mouse_x, mouse_y)
+            check_button_play(ai_settings, screen, game_stats, score_board, btn_play, ship, aliens_group, bullets_group, mouse_x, mouse_y)
 
 
-def update_screen(ai_settings, screen, game_stats, ship, aliens_group, bullets_group, button):
+def update_screen(ai_settings: Settings, screen: Surface, game_stats: GameStats, score_board: Scoreboard, ship: Ship,
+                  aliens_group: Group, bullets_group: Group, button):
     """
     Atualiza as imagens na tela, e gera/seta a mais recente \n\r
     Atualiza também todo os conteúdos que devem ir para a tela \n\r
@@ -131,6 +168,9 @@ def update_screen(ai_settings, screen, game_stats, ship, aliens_group, bullets_g
     ship.blitme()
     aliens_group.draw(screen)
 
+    # desenha a pontuação
+    score_board.show_score()
+
     # desenha o botão se o jogo não estiver ativo
     if not game_stats.game_active:
         button.draw_button()
@@ -139,12 +179,15 @@ def update_screen(ai_settings, screen, game_stats, ship, aliens_group, bullets_g
     pygame.display.flip()
 
 
-def update_bullets(ai_settings, screen, ship_height, bullets_group, aliens_group):
+def update_bullets(ai_settings: Settings, screen: Surface, stats: GameStats, score_board: Scoreboard,
+                   ship_height, bullets_group: Group, aliens_group: Group):
     """
     Atualiza os projéteis na tela e limpa os que passaram os limites da screen \n\r
     Chama método para verificar colisão com algum alien \n\r
     :param ai_settings: Configurações do jogo, objeto do tipo Settings()
     :param screen: Tela/quadro do jogo, objeto de pygame.display.set_mode()
+    :param score_board: Objeto de Scoreboard
+    :param stats: objeto de GameStats
     :param ship_height: Altura da espaçonave
     :param bullets_group: Grupo de projéteis gerados, objeto de pygame.sprite.Group()
     :param aliens_group: Grupo de aliens gerados, objeto de pygame.sprite.Group()
@@ -159,16 +202,19 @@ def update_bullets(ai_settings, screen, ship_height, bullets_group, aliens_group
             bullets_group.remove(bullet)
 
     # verifica se um projétil atingiu o alien
-    check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, aliens_group)
+    check_colisao_bullet_alien(ai_settings, screen, stats, score_board, ship_height, bullets_group, aliens_group)
 
 
-def check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, aliens_group):
+def check_colisao_bullet_alien(ai_settings: Settings, screen: Surface, stats: GameStats, score_board: Scoreboard,
+                               ship_height, bullets_group: Group, aliens_group: Group):
     """
     Resolve a colisão entre projeteis e aliens \n\r
     Ao colidir, remove o projétil e o alien \n\r
     Cria uma nova leva de aliens caso não tenha mais ao remover \n\r
     :param ai_settings: Objeto da classe Settings
     :param screen: Objecto de pygame.display.set_mode()
+    :param score_board: Objeto de Scoreboard
+    :param stats: objeto de GameStats
     :param ship_height: Altura da nave
     :param bullets_group: Grupo de projéteis Objeto de pygame.sprite.Group()
     :param aliens_group: Grupo de alienígena, Objeto de pygame.sprite.Group()
@@ -176,10 +222,22 @@ def check_colisao_bullet_alien(ai_settings, screen, ship_height, bullets_group, 
     # caso sim, remove o alien e o projétil, por isso o True, True no final do método
     colisoes = pygame.sprite.groupcollide(bullets_group, aliens_group, True, True)
 
+    # acrescenta a pontuação
+    if colisoes:
+        for aliens in colisoes.values():
+            stats.score += ai_settings.alien_points * len(aliens)
+            score_board.prep_score()
+        check_high_score(stats, score_board)
+
     # verifica se ainda existem aliens, caso não, limpa as balas e recria a frota
     if len(aliens_group) == 0:
         # apaga os projéteis
         bullets_group.empty()
+        # aumenta a velocidade
+        ai_settings.increase_speed()
+        # aumenta o nível
+        stats.level += 1
+        score_board.prep_level()
         # recria frota de aliens
         create_fleet(ai_settings, screen, ship_height, aliens_group)
 
@@ -213,7 +271,7 @@ def get_number_aliens_x(screen_width, alien_width) -> int:
     return numero_aliens_x
 
 
-def create_alien(ai_settings, screen, aliens_group, alien_number, numero_linhas):
+def create_alien(ai_settings: Settings, screen: Surface, aliens_group: Group, alien_number, numero_linhas):
     """
     Cria um alien e o adiciona em aliens_group, grupo de aliens gerenciado na tela \n\r
     :param ai_settings: Objeto de Settings() passao por parametro em Alien()
@@ -233,7 +291,7 @@ def create_alien(ai_settings, screen, aliens_group, alien_number, numero_linhas)
     aliens_group.add(alien)
 
 
-def create_fleet(ai_settings, screen, ship_height, aliens_group):
+def create_fleet(ai_settings: Settings, screen: Surface, ship_height, aliens_group: Group):
     """
     Cria uma frota de alienígena \n\r
     Utiliza o primeiro criado para calcular a quantidade por linha e o espaçamento \n\r
@@ -254,7 +312,7 @@ def create_fleet(ai_settings, screen, ship_height, aliens_group):
             create_alien(ai_settings, screen, aliens_group, numero_x, numero_y)
 
 
-def check_fleet_bordas(ai_settings, aliens_group):
+def check_fleet_bordas(ai_settings: Settings, aliens_group: Group):
     """
     Verifica se algum alien do group encostou na borda \n\r
     :param ai_settings: Objeto da classe Settings()
@@ -266,7 +324,7 @@ def check_fleet_bordas(ai_settings, aliens_group):
             break
 
 
-def mudar_direcao_fleet(ai_settings, aliens_group):
+def mudar_direcao_fleet(ai_settings: Settings, aliens_group: Group):
     """
     Faz toda a tropa descer e muda a direção \n\r
     :param ai_settings: Objeto da classe Settings()
@@ -280,7 +338,8 @@ def mudar_direcao_fleet(ai_settings, aliens_group):
     ai_settings.fleet_alien_direction *= -1
 
 
-def update_aliens(ai_settings, game_stats, screen, ship, aliens_group, bullets_group):
+def update_aliens(ai_settings: Settings, game_stats: GameStats, score_board: Scoreboard, screen: Surface,
+                  ship: Ship, aliens_group: Group, bullets_group: Group):
     """
     Atualiza a posição dos aliens do grupo de aliens \n\r
     Chamada de método para verifica se algum alien encostou nas bordas \n\r
@@ -300,13 +359,14 @@ def update_aliens(ai_settings, game_stats, screen, ship, aliens_group, bullets_g
 
     # verifica se houve colisão entre a nave ou qualquer alien do grupo
     if pygame.sprite.spritecollideany(ship, aliens_group):
-        ship_hit(ai_settings, game_stats, screen, ship, aliens_group, bullets_group)
+        ship_hit(ai_settings, game_stats, screen, score_board, ship, aliens_group, bullets_group)
 
     # Verifica se alguma alien atingiu o bottom da tela
-    check_alien_bottom(ai_settings, game_stats, screen, ship, aliens_group, bullets_group)
+    check_alien_bottom(ai_settings, game_stats, screen, score_board, ship, aliens_group, bullets_group)
 
 
-def ship_hit(ai_settings, game_stats, screen, ship, aliens_group, bullets_group):
+def ship_hit(ai_settings: Settings, game_stats, screen: Surface, score_board: Scoreboard, ship: Ship,
+             aliens_group: Group, bullets_group: Group):
     """
     Responde quando uma espaçonave é atingida/encosta em um alien \n\r
     Reduzindo a quantidade de tentativas, reiniciando a frota de aliens e limpando os projéteis \n\r
@@ -321,6 +381,8 @@ def ship_hit(ai_settings, game_stats, screen, ship, aliens_group, bullets_group)
     if game_stats.ships_left > 0:
         # decrementa a quantidade de tentativas
         game_stats.ships_left -= 1
+        # atualiza a imagens das naves restantes
+        score_board.prep_ships()
 
         # limpa os aliens e projéteis
         aliens_group.empty()
@@ -334,9 +396,11 @@ def ship_hit(ai_settings, game_stats, screen, ship, aliens_group, bullets_group)
         sleep(0.5)
     else:
         game_stats.game_active = False
+        pygame.mouse.set_visible(True)
 
 
-def check_alien_bottom(ai_settings, game_stats, screen, ship, aliens_group, bullets_group):
+def check_alien_bottom(ai_settings: Settings, game_stats, screen: Surface, score_board: Scoreboard, ship: Ship,
+                       aliens_group: Group, bullets_group: Group):
     """
     Verifica se algum alien encostou na parte inferior da tela \n\r
     Ao encostar, chama mesmo método de colisão de alien com a espaçonave \n\r
@@ -354,4 +418,10 @@ def check_alien_bottom(ai_settings, game_stats, screen, ship, aliens_group, bull
     for alien in aliens_group.sprites():
         if alien.rect.bottom >= screen_rect.bottom:
             # mesmo quando nave atinge alien
-            ship_hit(ai_settings, game_stats, screen, ship, aliens_group, bullets_group)
+            ship_hit(ai_settings, game_stats, screen, score_board, ship, aliens_group, bullets_group)
+
+
+def check_high_score(stats: GameStats, score_board: Scoreboard):
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        score_board.prep_high_score()

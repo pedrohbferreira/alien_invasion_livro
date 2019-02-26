@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import pygame.font
+from pygame import Surface
 
 
 class Button(object):
     """Classe responsável pelos botões da tela"""
 
-    def __init__(self, screen, mensagem):
+    def __init__(self, screen: Surface, mensagem: str):
         """
         Cria uma instancia de Button, passando as configurações do jogo, a tela e a mensagem \n\r
         param ai_settings: Configurações o jogo, objeto do tipo Settings()\n\r
@@ -29,7 +30,7 @@ class Button(object):
         # a mensagem deve ser somente uma vez
         self.prep_msg(mensagem)
 
-    def prep_msg(self, mensagem):
+    def prep_msg(self, mensagem: str):
         """
         Prepara a mensagem, transformando-a em imagem renderizada e centraliza no botão
         :param mensagem: Mensagem do botão
